@@ -11,53 +11,55 @@ services:
       - mongodb-primary
       - mongodb-secondary
       - mongodb-arbiter
-      # - billing
-      # - auth
-      # - rabbitmq
+      - billing
+      - auth
+      - rabbitmq
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
       - '8000:8000'
-  # billing:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/billing/Dockerfile
-  #     target: development
-  #   command: npm run start:dev billing
-  #   env_file:
-  #     - ./apps/billing/.env
-  #   depends_on:
-  #     - mongodb-primary
-  #     - mongodb-secondary
-  #     - mongodb-arbiter
-  #     - rabbitmq
-  #     - auth
-  #   volumes:
-  #     - .:/usr/src/app
-  #     - /usr/src/app/node_modules
-  # auth:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/auth/Dockerfile
-  #     target: development
-  #   command: npm run start:dev auth
-  #   ports:
-  #     - '3001:3001'
-  #   env_file:
-  #     - ./apps/auth/.env
-  #   depends_on:
-  #     - mongodb-primary
-  #     - mongodb-secondary
-  #     - mongodb-arbiter
-  #     - rabbitmq
-  #   volumes:
-  #     - .:/usr/src/app
-  #     - /usr/src/app/node_modules
-  # rabbitmq:
-  #   image: rabbitmq
-  #   ports:
-  #     - '5672:5672'
+  billing:
+    build:
+      context: .
+      dockerfile: ./apps/billing/Dockerfile
+      target: dev
+    command: npm run start:dev billing
+    env_file:
+      - ./apps/billing/.env
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
+      - rabbitmq
+      - auth
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: dev
+    command: npm run start:dev auth
+    ports:
+      - '8001:8001'
+    env_file:
+      - ./apps/auth/.env
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+  rabbitmq:
+    image: rabbitmq:3.9.21-management-alpine
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+      - '15671:15671'
   mongodb-primary:
     image: docker.io/bitnami/mongodb:5.0
     environment:
